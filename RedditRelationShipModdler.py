@@ -1,4 +1,6 @@
 ## Imports ##
+import time
+from types import NoneType
 import praw
 from py2neo import Graph, Node, Relationship
 
@@ -13,21 +15,32 @@ reddit = praw.Reddit(
         )
 
 graph = Graph("bolt://0.0.0.0:7687")
-¡™¡
+
 
 def getSubmissionsinSubreddit(subreddit, depth):
-    try:
+        #start = time.perf_counter()
+        #startNodes = len(graph.nodes)
+        #
+        # startRelationships = len(graph.relationships)
+        
         if subreddit.display_name == "Home":
             return
-        for submission in subreddit.top(limit=5):
-            subredditNode = Node("Subreddit", RedditId=subreddit.id, name=subreddit.display_name, )
-            submissionNode = Node("Submission", RedditId=submission.id, name=submission.title, subreddit=submission.subreddit.display_name, )
-            authorNode = Node("User", name=submission.author.name, RedditId=submission.author.name)
-            graph.merge(Relationship(authorNode, "posted", submissionNode), "ID", "RedditId")
-            graph.merge(Relationship(submissionNode, "submitted to", subredditNode), "ID", "RedditId")
-            getSubmissionsByUser(reddit.redditor(submission.author.name), depth)
-    except AttributeError:
-        return
+        for subNum, submission in enumerate(subreddit.top(limit=5)):
+            
+            try:
+                #print(f"Submission {subNum} in {subreddit.display_name}, at depth {depth}")
+                subredditNode = Node("Subreddit", RedditId=subreddit.id, name=subreddit.display_name, )
+                submissionNode = Node("Submission", RedditId=submission.id, name=submission.title, subreddit=submission.subreddit.display_name, )
+                authorNode = Node("User", name=submission.author.name, RedditId=submission.author.name)
+                graph.merge(Relationship(authorNode, "posted", submissionNode), "ID", "RedditId")
+                graph.merge(Relationship(submissionNode, "submitted to", subredditNode), "ID", "RedditId")
+                getSubmissionsByUser(reddit.redditor(submission.author.name), depth)
+                #print(f"Added nodes: {len(graph.nodes) - startNodes}")
+            #except nonetype:
+            except Exception as e:
+                print(e)
+                continue
+    
 def getSubmissionsByUser(author, depth):
     if depth == 0:
         return
