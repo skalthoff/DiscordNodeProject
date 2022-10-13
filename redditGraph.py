@@ -18,17 +18,15 @@ reddit = praw.Reddit(
 graph = Graph("bolt://0.0.0.0:7687")
 
 def getSubredditTop(subreddit):
-    for submission in subreddit.top(limit=8):
+    for submission in subreddit.top(limit=20):
         subReddit = Node("Subreddit", name=subreddit.display_name, RedditId=subreddit.id)
         submissionNode = Node("Submission", name=submission.title, subreddit=submission.subreddit.display_name, RedditId=submission.id)
         
         if submission.author is not None:
             author = reddit.redditor(submission.author.name)
             userNode = Node("User", name=author.name, RedditId=author.name)
-            posting = Relationship(userNode, "POSTED", submissionNode)
-            submitting = Relationship(submissionNode, "SUBMITTED_TO", subReddit)
-            graph.merge(posting, "User", "name")
-            graph.merge(submitting, "Submission", "RedditId")
+            graph.merge(Relationship(userNode, "POSTED", submissionNode), "User", "name")
+            graph.merge(Relationship(submissionNode, "SUBMITTED_TO", subReddit), "Submission", "RedditId")
             getUserTopSubmissions(author)
         else:
             author = "deleted"
@@ -43,7 +41,7 @@ def getUserTopSubmissions(author):
     if author == "deleted":
         return
     try:
-        for submission in author.submissions.top(limit=8):
+        for submission in author.submissions.top(limit=20):
                 author = reddit.redditor(submission.author.name)
                 submissionNode = Node("Submission", name=submission.title, subreddit=submission.subreddit.display_name, RedditId=submission.id)
                 subReddit = Node("Subreddit", name=submission.subreddit.display_name, RedditId=submission.subreddit.id)
@@ -64,7 +62,7 @@ def recursiveSubredditGrabber(subreddit, depth):
         return
     subreddit = reddit.subreddit(subreddit)
     getSubredditTop(subreddit)
-    for submission in subreddit.top(limit=8):
+    for submission in subreddit.top(limit=20):
         if submission.author is not None:
             author = reddit.redditor(submission.author.name)
             userSubreddits = getUserTopSubmissions(author)
@@ -74,7 +72,7 @@ def recursiveSubredditGrabber(subreddit, depth):
     
     
 def main():
-    recursiveSubredditGrabber("Sino", 4)
+    recursiveSubredditGrabber("Sino", 15)
 
 
 if __name__ == "__main__":
