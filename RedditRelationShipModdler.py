@@ -13,35 +13,48 @@ reddit = praw.Reddit(
         )
 
 graph = Graph("bolt://0.0.0.0:7687")
+¡™¡
 
-
-def getSubmissionsinSubreddit(subreddit):
+def getSubmissionsinSubreddit(subreddit, depth):
     try:
-        for submission in subreddit.top(limit=200):
-            subredditNode = Node("Subreddit", name=subreddit.display_name, RedditId=subreddit.id)
-            submissionNode = Node("Submission", name=submission.title, subreddit=submission.subreddit.display_name, RedditId=submission.id)
+        if subreddit.display_name == "Home":
+            return
+        for submission in subreddit.top(limit=5):
+            subredditNode = Node("Subreddit", RedditId=subreddit.id, name=subreddit.display_name, )
+            submissionNode = Node("Submission", RedditId=submission.id, name=submission.title, subreddit=submission.subreddit.display_name, )
             authorNode = Node("User", name=submission.author.name, RedditId=submission.author.name)
-            graph.merge(Relationship(authorNode, "posted", submissionNode), "User", "name")
-            graph.merge(Relationship(submissionNode, "submitted to", subredditNode), "Submission", "RedditId")
-            getSubmissionsByUser(reddit.redditor(submission.author.name))
+            graph.merge(Relationship(authorNode, "posted", submissionNode), "ID", "RedditId")
+            graph.merge(Relationship(submissionNode, "submitted to", subredditNode), "ID", "RedditId")
+            getSubmissionsByUser(reddit.redditor(submission.author.name), depth)
     except AttributeError:
         return
-def getSubmissionsByUser(author):
+def getSubmissionsByUser(author, depth):
+    if depth == 0:
+        return
     try:
-        for submission in author.submissions.top(limit=200):
-            submissionNode = Node("Submission", name=submission.title, subreddit=submission.subreddit.display_name, RedditId=submission.id)
-            subredditNode = Node("Subreddit", name=submission.subreddit.display_name, RedditId=submission.subreddit.id)
-            authorNode = Node("User", name=author.name, RedditId=author.id)
-            graph.merge(Relationship(authorNode, "authored", submissionNode), "User", "name")
-            graph.merge(Relationship(submissionNode, "submitted to", subredditNode), "Submission", "RedditId")
+        for submission in author.submissions.top(limit=5):
+            submissionNode = Node("Submission", RedditId=submission.id, name=submission.title, subreddit=submission.subreddit.display_name)
+            subredditNode = Node("Subreddit", RedditId=submission.subreddit.id, name=submission.subreddit.display_name)
+            if submission.subreddit.display_name == "Home":
+                return
+            authorNode = Node("User",RedditId=author.id, name=author.name)
+            graph.merge(Relationship(authorNode, "authored", submissionNode), "ID", "RedditId")
+            graph.merge(Relationship(submissionNode, "submitted to", subredditNode), "ID", "RedditId")
+            
+            getSubmissionsinSubreddit(reddit.subreddit(submission.subreddit.display_name), depth-1)
         #except 403:
     except Exception as e:
         print(e)
         return
+    
+
 
 def main():
-    subreddit = reddit.subreddit("AskReddit")
-    getSubmissionsinSubreddit(subreddit)
+    #subredditList = reddit.subreddits.popular(limit=10)
+    subredditList = [reddit.subreddit("WorldNews")]
+    for subreddit in subredditList:
+        getSubmissionsinSubreddit(subreddit, depth=3)
+    
     
 if __name__ == "__main__":
     main()
