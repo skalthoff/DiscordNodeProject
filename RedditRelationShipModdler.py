@@ -28,7 +28,7 @@ def getSubmissionsinSubreddit(subreddit):
         return
 def getSubmissionsByUser(author):
     try:
-        for submission in author.submissions.top(limit=20):
+        for submission in author.submissions.top(limit=200):
             submissionNode = Node("Submission", name=submission.title, subreddit=submission.subreddit.display_name, RedditId=submission.id)
             subredditNode = Node("Subreddit", name=submission.subreddit.display_name, RedditId=submission.subreddit.id)
             authorNode = Node("User", name=author.name, RedditId=author.id)
