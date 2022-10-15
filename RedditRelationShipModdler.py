@@ -14,7 +14,7 @@ reddit = praw.Reddit(
             password=".e9Yy9i8A9-X$uh",
         )
 
-graph = Graph("bolt://0.0.0.0:7687")
+graph = Graph("bolt://192.168.1.11:7687")
 
 
 def getSubmissionsinSubreddit(subreddit, depth):
@@ -27,7 +27,7 @@ def getSubmissionsinSubreddit(subreddit, depth):
     
     if subreddit.display_name == "Home":
         return
-    for submission in subreddit.top(limit=15):
+    for submission in subreddit.top(limit=200):
         
         
         #print(f"Submission {subNum} in {subreddit.display_name}, at depth {depth}")
@@ -53,7 +53,7 @@ def getSubmissionsByUser(author, depth):
     if depth < 0:
         return
     try:
-        for submission in author.submissions.top(limit=15):
+        for submission in author.submissions.top(limit=200):
             submissionNode = Node("Submission", RedditId=submission.id, name=submission.title, subreddit=submission.subreddit.display_name)
             subredditNode = Node("Subreddit", RedditId=submission.subreddit.id, name=submission.subreddit.display_name)
             if submission.subreddit.display_name == "Home":

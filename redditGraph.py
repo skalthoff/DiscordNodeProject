@@ -15,7 +15,7 @@ reddit = praw.Reddit(
         )
 
 #graph = Graph("bolt://3.239.191.198:7687", auth=("neo4j", "blanks-prisons-activities"))
-graph = Graph("bolt://0.0.0.0:7687")
+graph = Graph("bolt://192.168.1.11:7687")
 
 def getSubredditTop(subreddit):
     for submission in subreddit.top(limit=20):
