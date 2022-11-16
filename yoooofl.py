@@ -24,7 +24,7 @@ def getSubmissionsinSubreddit(subreddit, depth):
     try:
         if subreddit.display_name == "Home":
             return
-        for submission in subreddit.top(limit=5):
+        for submission in subreddit.top(limit=10):
             subredditNode = Node("Subreddit", RedditId=subreddit.id, name=subreddit.display_name, )
             submissionNode = Node("Submission", RedditId=submission.id, name=submission.title, subreddit=submission.subreddit.display_name, )
             authorNode = Node("User", name=submission.author.name, RedditId=submission.author.name)
@@ -37,7 +37,7 @@ def getSubmissionsByUser(author, depth):
     if depth == 0:
         return
     try:
-        for submission in author.submissions.top(limit=5):
+        for submission in author.submissions.top(limit=10):
             submissionNode = Node("Submission", RedditId=submission.id, name=submission.title, subreddit=submission.subreddit.display_name)
             subredditNode = Node("Subreddit", RedditId=submission.subreddit.id, name=submission.subreddit.display_name)
             if submission.subreddit.display_name == "Home":
@@ -56,11 +56,10 @@ def getSubmissionsByUser(author, depth):
 
 def main():
     global subredditList
-    subreddits = reddit.subreddits.popular(limit=10)
-    
+    subreddits = reddit.subreddits.popular(limit=30)
     subredditList = [s.display_name for s in subreddits]
     for subreddit in subredditList:
-        getSubmissionsinSubreddit(subreddit, depth=5)
+        getSubmissionsinSubreddit(subreddit, depth=10)
     
     
 if __name__ == "__main__":
