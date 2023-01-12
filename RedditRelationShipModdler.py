@@ -6,15 +6,9 @@ from py2neo import Graph, Node, Relationship
 
 
 
-reddit = praw.Reddit(
-            user_agent="bot name",
-            client_id="EYwG-SMcl6cdbw",
-            client_secret="CW1lJ0PkQPcsaKTx35FLEbQPboUFlQ",
-            username="epic_gamer_4268",
-            password=".e9Yy9i8A9-X$uh",
-        )
+reddit = [Reddit Api]
 
-graph = Graph("bolt://192.168.1.11:7687")
+graph = Graph([IP Address])
 
 
 def getSubmissionsinSubreddit(subreddit, depth):

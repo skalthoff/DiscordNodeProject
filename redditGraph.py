@@ -51,9 +51,7 @@ def getUserTopSubmissions(author):
                 graph.merge(Relationship(submissionNode, "Submitted to", subReddit), "Submission", "RedditId")
     except Exception as e:
         print(e)
-        
         return userSubreddits
-            
 
 
 
